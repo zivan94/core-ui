@@ -26,7 +26,49 @@ export default function() {
             new core.form.editors.BooleanEditor({
                 value: true,
                 displayText: 'Make me some tea!'
-            })
+            }),
+            new core.form.editors.DropdownEditor({
+                model: new Backbone.Model({ key: 1 }),
+                key: 'key',
+                autocommit: true,
+                collection: new Backbone.Collection()
+            }),
+            new core.form.editors.ReferenceBubbleEditor({
+                model: new Backbone.Model({ key: 1 }),
+                key: 'key',
+                autocommit: true,
+                collection: new Backbone.Collection([{
+                    id: 1,
+                    text: 'test'
+                }, {
+                    id: 2,
+                    text: 'testtesttesttest'
+                }, {
+                    id: 3,
+                    text: 'testtesttesttesttesttest'
+                }, {
+                    id: 4,
+                    text: 'testtesttesttesttesttesttesttesttest'
+                }, {
+                    id: 5,
+                    text: 'testtesttesttesttesttesttesttesttesttesttesttest'
+                }, {
+                    id: 6,
+                    text: 'testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest'
+                }])
+            }),
+            new core.form.editors.MultiSelectEditor({
+                model: new Backbone.Model({ key: 1 }),
+                key: 'key',
+                autocommit: true,
+                collection: new Backbone.Collection()
+            }),
+            new core.form.editors.MemberSelectEditor({
+                model: new Backbone.Model({ key: 1 }),
+                key: 'key',
+                autocommit: true,
+                collection: new Backbone.Collection()
+            }),
         ]
     });
 }

@@ -292,6 +292,32 @@ describe('Editors', function() {
             expect(view.getValue()).toEqual([]);
         });
 
+        it('super sexy test', function() {
+            const model = new Backbone.Model({
+                value: [{ id: 1, name: 1 }, { id: 2, name: 2 }]
+            });
+
+            const view = new core.form.editors.ReferenceBubbleEditor({
+                model,
+                collection: this.defaultCollection,
+                key: 'value',
+                maxQuantitySelected: Infinity
+            });
+
+            this.rootRegion.show(view);
+
+            console.log(view.$('.js-bubble-delete').length);
+
+            const button = view.$('.js-button-region');
+            let buttonWidth = button.outerWidth();
+            buttonWidth = 70;
+            button.click();
+            const panel = view.$('.visible-collection');
+            console.log(panel);
+            const panelWidth = panel.outerWidth();
+            expect(panelWidth).toEqual(220);
+        });
+
         it('should remove items on uncheck in panel', function() {
             //Todo test
             expect(true).toEqual(true);
