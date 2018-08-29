@@ -254,7 +254,7 @@ export default Marionette.View.extend({
                     if (hasChildren) {
                         el.insertAdjacentHTML(
                             'beforeend',
-                            `<div class="${classes.collapsible} context-collapse-button"><span class="js-tree-first-cell collapsible-btn ${this.model.collapsed === false ? classes.expanded : ''}"></span></div>`
+                            `<div class="${classes.collapsible} context-collapse-button"><span class="js-tree-first-cell context-collapsible-btn ${this.model.collapsed === false ? classes.expanded : ''}"></span></div>`
                         );
                     }
                     isContext.style.marginLeft = `${margin + defaultOptions.subGroupMargin}px`;
