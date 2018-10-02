@@ -1,5 +1,5 @@
 //@flow
-import '../resources/styles/bootstrap-datetimepicker.css';
+import '../resources/styles/date-picker.css';
 import '../resources/styles/fonts.css';
 import '../resources/styles/common.css';
 import '../resources/styles/services/messageService.css';
@@ -43,16 +43,12 @@ import InterfaceErrorMessageService from './services/InterfaceErrorMessageServic
 import ThemeService from './services/ThemeService';
 
 import VirtualCollection from './collections/VirtualCollection';
-import CollectionHighlightableBehavior from './collections/behaviors/HighlightableBehavior';
-import CollapsibleBehavior from './models/behaviors/CollapsibleBehavior';
-import HighlightableBehavior from './models/behaviors/HighlightableBehavior';
 import SelectableBehavior from './models/behaviors/SelectableBehavior';
 import MobileService from './services/MobileService';
 
 import NavigationDrawer from './components/navigationDrawer/NavigationDrawer';
 import BreadCrumbs from './components/breadCrumbs/BreadCrumbs';
 import Toolbar from './components/toolbar/ToolbarView';
-import LayoutDesigner from './components/layoutDesigner';
 import VideoChat from './components/videoChat/VideoChat';
 
 /**
@@ -99,14 +95,6 @@ const core = {
      * @memberof module:core
      * */
     collections: {
-        /**
-         * Backbone collection behaviors of general use.
-         * @namespace
-         * @memberof module:core.collections
-         * */
-        behaviors: {
-            HighlightableBehavior: CollectionHighlightableBehavior
-        },
         VirtualCollection
     },
     /**
@@ -116,8 +104,6 @@ const core = {
      * */
     models: {
         behaviors: {
-            CollapsibleBehavior,
-            HighlightableBehavior,
             SelectableBehavior
         }
     },
@@ -165,7 +151,6 @@ const core = {
         NavigationDrawer,
         Toolbar,
         BreadCrumbs,
-        LayoutDesigner,
         VideoChat
     }
 };

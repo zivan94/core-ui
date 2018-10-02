@@ -27,6 +27,10 @@ export default Marionette.Object.extend({
         this.view.setLoading(state);
     },
 
+    validate() {
+        return this.view.validate();
+    },
+
     __createView(options) {
         const allToolbarActions = new VirtualCollection(new Backbone.Collection(this.__getToolbarActions()));
         const comparator = factory.getDefaultComparator(options.columns);
@@ -198,7 +202,7 @@ export default Marionette.Object.extend({
     },
 
     __confirmUserAction(text, title, yesButtonText, noButtonText) {
-        return Core.services.MessageService.showMessageDialog(text || '', title || '', [{ id: true, text: yesButtonText || 'Yes' }, { id: false, text: noButtonText || 'No' }]);
+        return Core.services.MessageService.showMessageDialog(text || '', title || '', [{ id: false, text: noButtonText || 'No' }, { id: true, text: yesButtonText || 'Yes' }]);
     },
 
     __triggerAction(model, selected) {

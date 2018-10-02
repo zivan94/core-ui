@@ -71,11 +71,19 @@ export default {
 
     // options: replace (history), trigger (routing)
     navigateToUrl(url, options = {}) {
+        let newUrl = url;
+
         if (options.trigger === undefined) {
             options.trigger = true;
         }
+
         shouldCheckUrl = options.trigger || activeUrl === url;
-        Backbone.history.navigate(url, options);
+
+        if (!shouldCheckUrl) {
+            newUrl = this.__getUpdatedUrl(url);
+        }
+
+        Backbone.history.navigate(newUrl, options);
     },
 
     getPreviousUrl() {
@@ -113,7 +121,10 @@ export default {
         if (!this.activeModule) {
             this.__showViewPlaceholder();
         } else {
-            await this.__leaveActiveModule(!!customModuleRegion);
+            const isLeaved = await this.__tryLeaveActiveModule(!!customModuleRegion);
+            if (!isLeaved) {
+                return;
+            }
         }
 
         // reject race condition
@@ -167,9 +178,14 @@ export default {
                 });
             }
         }
-        this.trigger('module:loaded', {
-            page: this.activeModule ? this.activeModule.moduleId : null
-        });
+        this.trigger('module:loaded', config, callbackName, routingArgs); //args like in Backbone.on('route')
+
+        if (activeSubModule) {
+            if (activeSubModule.onRoute) {
+                activeSubModule.routerAction = callbackName;
+                await activeSubModule.onRoute.apply(activeSubModule, routingArgs);
+            }
+        }
 
         // navigate to new module
         this.loadingContext = null;
@@ -200,13 +216,13 @@ export default {
             .show(new ContentLoadingView());
     },
 
-    async __leaveActiveModule(subModulePresented) {
+    async __tryLeaveActiveModule(subModulePresented) {
         const canLeave = await this.activeModule.leave();
 
         if (!canLeave && this.getPreviousUrl()) {
             // getting back to last url
             this.navigateToUrl(this.getPreviousUrl(), { replace: true, trigger: false });
-            return;
+            return false;
         }
         if (!subModulePresented) { //do not trigger events and cancel requests for submodules
             this.trigger('module:leave', {
@@ -218,6 +234,7 @@ export default {
                 this.activeModule.view.setModuleLoading(true);
             }
         }
+        return true;
     },
 
     __tryGetSubmoduleRegion(config) {
@@ -275,5 +292,20 @@ export default {
         } else {
             this.activeModule.componentQuery = null;
         }
+    },
+
+    __getUpdatedUrl(url) {
+        const cleanUrl = url.replace('#', '');
+        const prefix = cleanUrl.split('/')[0];
+        const urlParts = window.location.hash.split('&nxt');
+        const replaceIndex = urlParts.indexOf(prefix);
+
+        if (replaceIndex !== -1) {
+            urlParts.splice(replaceIndex, 1, cleanUrl);
+
+            return urlParts.join('&nxt');
+        }
+
+        return url;
     }
 };

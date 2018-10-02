@@ -31,7 +31,8 @@ const variables = {
     'main-color': 'var(--blue-300)',
     'error-color': 'var(--red)',
     'warning-color': '#e19e35',
-    'selected-color': 'var(--grey-100)',
+    'selected-background-color': 'var(--grey-100)',
+    'disabled-text-color': 'var(--grey-400)',
 
     'light-gradient': 'linear-gradient(#ffffff 35%, #e9e9e9)',
 
@@ -89,7 +90,7 @@ const variables = {
     'radio-right-margin': '10px',
     'radio-checked-color': 'var(--checkbox-checked-color)',
     'radio-inner-size': '10px',
-    'radio-checked-disabled-color': 'var(--grey-400)',
+    'radio-checked-disabled-color': 'var(--grey-300)',
 
     // grid
     'grid-toolbar-padding': '10px 6px 10px 0',
@@ -135,15 +136,15 @@ const variables = {
 
     'columns-select-border': '0',
 
-    'dropdown-padding': '0 20px 4px var(--form-input-padding)',
+    'dropdown-padding': '2px 20px 2px var(--form-input-padding)',
     'dropdown-font-size': 'var(--base-font-size)',
     'dropdown-group-fontsize': '12px',
     'dropdown-group-color': 'var(--black)',
     'dropdown-item-padding': '8px 20px',
     'dropdown-item-checkbox-padding': '10px',
     'dropdown-item-hover-color': 'var(--blue-100)',
-    'bubbles-item-delete-padding': '20px',
-    'bubbles-item-edit-delete-padding': '40px',
+    'bubbles-item-delete-padding': '0',
+    'bubbles-item-edit-delete-padding': '20px',
     'bubbles-icon-offset-x': '5px',
 
     'collapse-icon-header': `url(${utils.buildIcon(icons.angleRight, 'var(--white)')})`,
@@ -238,7 +239,7 @@ module.exports.apply = {
     },
     'bubbles-item-theme': {
         color: variables['text-color'],
-        padding: '4px 20px 0px 0'
+        padding: '2px 20px 2px 0'
     },
     'input-theme': {
         border: variables.border,
@@ -248,8 +249,16 @@ module.exports.apply = {
     'input-disabled-theme': {
         'background-color': variables['grey-100']
     },
+    'cell-input-disabled-theme': {
+        'background-color': 'transparent'
+    },
     'input-search-clear-theme': {
-        display: 'none'
+        width: '26px',
+        height: '26px',
+        right: '0',
+        opacity: '.8',
+        background:
+            'no-repeat 50% 50% url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHZJREFUeNpinDlzpj0DA0M7EPsD8WsGCBAF4i1AXMYEJLqA2BKId0ElQHgvEJuB5FiAhA9UwABKg4AuEF8GybFAjXWGSupCFVyGir1mYiAAmJDshBl7GcoGiYmyQF2ri2QsA5KGLSATKoH4FMxOJDedBckBBBgAX6IbvaqTe1UAAAAASUVORK5CYII=)'
     },
     'textarea-theme': {
         border: variables.border,
@@ -421,7 +430,7 @@ module.exports.apply = {
         padding: '15px'
     },
     'popup-close-theme': {
-        'font-size': '17px'//if icons style = solid, then 19px
+        'font-size': '17px' //if icons style = solid, then 19px
     },
     'popup-form-content-theme': {
         padding: '15px',

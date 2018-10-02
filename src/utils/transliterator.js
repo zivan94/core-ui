@@ -12,14 +12,31 @@ export default {
         ['ö', 'o'],  ['Ü', 'U'],  ['ü', 'u'],   ['ß', 's']
     ]),
 
-    setOptionsToComputedTransliteratedFields(schema, transliteratedFields = {name: 'alias'}, options = {
+    initializeTransliteration(options) {
+        if (options.schema) {
+            if (this.isShemaNew(options.schema)) {
+                options.schema = this.setOptionsToFieldsOfNewSchema(options.schema, options.transliteratedFields, options.inputSettings);
+            } else {
+                this.setOptionsToComputedTransliteratedFields(options.schema, options.transliteratedFields, options.inputSettings);
+            }
+        }
+        if (options.model) {
+            this.extendComputed(options.model, options.transliteratedFields, options.schema);
+            options.model.computedFields = new Backbone.ComputedFields(options.model);
+        }
+        return {
+            schema: options.schema,
+            model: options.model,
+            transliteratedFields: options.transliteratedFields
+        }
+    },
+
+    setOptionsToComputedTransliteratedFields(schema, transliteratedFields = {name: 'alias'}, inputSettings = {
             changeMode: 'blur',
             autocommit: true,
             forceCommit: true,
             transliteratorChangedSomeProperties: true
         }) {
-        const newSchema = Object.assign({}, schema);
-
         let computedRelatedFields = Object.values(transliteratedFields);
         computedRelatedFields = computedRelatedFields.concat(Object.keys(transliteratedFields).filter(name => !(schema[name] && schema[name].allowEmptyValue)));
 
@@ -28,16 +45,39 @@ export default {
                 console.warn(`Transliterator: schema has no input '${input}'`);
                 return;
             }
-            Object.keys(options).forEach((propetry) => {
-                if (schema[input][propetry] && !schema[input].transliteratorChangedSomeProperties) {
+            Object.keys(inputSettings).forEach((propetry) => {
+                if (schema[input][propetry] !== undefined && !schema[input].transliteratorChangedSomeProperties) {
                     console.warn(`Transliterator: Property '${propetry}' of input '${input}' was overwritten`);
                 }
             });
-            Object.assign(newSchema[input], options);
+            Object.assign(schema[input], inputSettings);
         });
 
-        return newSchema;
+        return schema;
     },
+
+    setOptionsToFieldsOfNewSchema(newSchema, transliteratedFields, inputSettings) {
+        const changedSchemaOldType = this.setOptionsToComputedTransliteratedFields(this.mapNewSchemaToOld(newSchema), transliteratedFields, inputSettings);
+        return this.mapOldSchemaToNew(changedSchemaOldType);
+    },
+
+    isShemaNew(schema) {
+        return Array.isArray(schema);
+    },
+
+    mapNewSchemaToOld(newSchema) {
+        return newSchema.reduce((oldShema, input) => {
+            oldShema[input.key] = _.omit(input, 'key');
+            return oldShema;
+        }, {});
+    },
+
+    mapOldSchemaToNew(oldShema) {
+        return Object.entries(oldShema).map(keyValue => {
+            keyValue[1].key = keyValue[0];
+            return keyValue[1]
+        });
+    },  
 
     systemNameFiltration(string) {
         if (!string) {
@@ -69,7 +109,7 @@ export default {
     },
 
     extendComputed(model, transliteratedFields = {name: 'alias'}, schema = {}) {
-        const computed = model.computed || {};
+        const computed = model.computed = model.computed || {};
 
         const required = function(name) {
             return function(fields) {
@@ -82,7 +122,7 @@ export default {
         const getTranslite = (name, alias) =>
             (fields) => {
                 if (fields[alias]) {
-                    return fields[alias];
+                    return this.systemNameFiltration(fields[alias]);
                 }
                 return this.systemNameFiltration(fields[name]);
             };
@@ -115,7 +155,7 @@ export default {
             };
         });
 
-        return computed;
+        return model;
     },
 
     translite(text) {

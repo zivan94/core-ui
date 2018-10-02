@@ -86,7 +86,7 @@ export default {
         },
         {
             id: 'editors',
-            displayName: 'From and editors',
+            displayName: 'Forms and editors',
             groups: [
                 {
                     id: 'MultiEditorEditor',
@@ -401,11 +401,6 @@ export default {
                     description: 'List with search'
                 },
                 {
-                    id: 'listGroupBy',
-                    displayName: 'List (Group By)',
-                    description: 'List with grouping'
-                },
-                {
                     id: 'grid',
                     displayName: 'Grid',
                     description: 'Simple grid'
@@ -449,17 +444,6 @@ export default {
                 {
                     id: 'loadingBehavior',
                     displayName: 'Loading Behavior'
-                }
-            ]
-        },
-        {
-            id: 'sandbox',
-            displayName: 'Sandbox',
-            groups: [
-                {
-                    id: 'LayoutDesigner',
-                    displayName: 'Layout Designer',
-                    description: 'Layout Designer'
                 }
             ]
         },

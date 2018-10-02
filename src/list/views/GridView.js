@@ -1,11 +1,12 @@
 //@flow
 /* eslint-disable no-param-reassign */
 
+import form from 'form';
 import template from '../templates/grid.hbs';
 import ListView from './CollectionView';
 import RowView from './RowView';
-import SelectionPanelView from './SelectionPanelView';
-import SelectionCellView from './SelectionCellView';
+import SelectionPanelView from './selections/SelectionPanelView';
+import SelectionCellView from './selections/SelectionCellView';
 import GridHeaderView from './GridHeaderView';
 import NoColumnsDefaultView from './NoColumnsView';
 import LoadingChildView from './LoadingRowView';
@@ -13,6 +14,8 @@ import ToolbarView from '../../components/toolbar/ToolbarView';
 import MobileService from '../../services/MobileService';
 import LoadingBehavior from '../../views/behaviors/LoadingBehavior';
 import SearchBarView from '../../views/SearchBarView';
+import ConfigurationPanel from './ConfigurationPanel';
+import transliterator from 'utils/transliterator';
 
 /*
     Public interface:
@@ -62,6 +65,10 @@ export default Marionette.View.extend({
             throw new Error('You must provide columns definition ("columns" option)');
         }
 
+        if (typeof options.transliteratedFields === 'object') {
+            options.columns = transliterator.setOptionsToFieldsOfNewSchema(options.columns, options.transliteratedFields);
+        }
+
         options.onColumnSort && (this.onColumnSort = options.onColumnSort); //jshint ignore:line
 
         this.uniqueId = _.uniqueId('native-grid');
@@ -109,6 +116,7 @@ export default Marionette.View.extend({
 
         const childViewOptions = Object.assign(options.childViewOptions || {}, {
             columns: options.columns,
+            transliteratedFields: options.transliteratedFields,
             gridEventAggregator: this,
             columnClasses: this.columnClasses,
             isTree: this.options.isTree
@@ -171,6 +179,10 @@ export default Marionette.View.extend({
                 this.listenTo(this.selectionPanelView, 'childview:drag:drop', (...args) => this.trigger('drag:drop', ...args));
                 this.listenTo(this.selectionHeaderView, 'drag:drop', (...args) => this.trigger('drag:drop', ...args));
             }
+
+            if (this.options.showConfigurationPanel) {
+                this.__initializeConfigurationPanel();
+            }
         }
 
         this.listenTo(this.listView, 'all', (eventName, eventArguments) => {
@@ -218,7 +230,10 @@ export default Marionette.View.extend({
         selectionPanelRegion: '.js-grid-selection-panel-view',
         selectionHeaderRegion: '.js-grid-selection-header-view',
         noColumnsViewRegion: '.js-nocolumns-view-region',
-        toolbarRegion: '.js-grid-tools-toolbar-region',
+        toolbarRegion: {
+            el: '.js-grid-tools-toolbar-region',
+            replaceElement: true
+        },
         searchRegion: '.js-grid-tools-search-region',
         loadingRegion: '.js-grid-loading-region'
     },
@@ -282,9 +297,10 @@ export default Marionette.View.extend({
         }
 
         if (this.getOption('title')) {
+            this.ui.title.parent().show();
             this.ui.title.text(this.getOption('title') || '');
         } else {
-            this.ui.title.hide();
+            this.ui.title.parent().hide();
         }
         this.updatePosition = this.listView.updatePosition.bind(this.listView.collectionView);
     },
@@ -331,6 +347,7 @@ export default Marionette.View.extend({
 
     onDestroy() {
         this.styleSheet && document.body && document.body.contains(this.styleSheet) && document.body.removeChild(this.styleSheet);
+        this.__configurationPanel && this.__configurationPanel.destroy();
     },
 
     sortBy(columnIndex, sorting) {
@@ -384,6 +401,51 @@ export default Marionette.View.extend({
         if (!this.isDestroyed()) {
             this.loading.setLoading(state);
         }
+    },
+
+    validate() {
+        if (!this.isEditable) {
+            return;
+        }
+
+        return this.options.columns.some(column => {
+            if (!column.editable || !column.validators) {
+                return false;
+            }
+            const validators = [];
+            return column.validators.some(validator => {
+                let result;
+                if (typeof validator === 'function') {
+                    validators.push(validator);
+                } else {
+                    const predefined = form.repository.validators[validator];
+                    if (typeof predefined === 'function') {
+                        validators.push(predefined());
+                    }
+                }
+
+                this.collection.forEach(model => {
+                    if (model._events['validate:force']) {
+                        const e = {};
+                        model.trigger('validate:force', e);
+                        if (e.validationResult) {
+                            result = e.validationResult;
+                        }
+                    } else if (!model.isValid()) {
+                        result = model.validationResult;
+                    } else {
+                        validators.some(v => {
+                            const error = v(model.get(column.key), model.attributes);
+                            if (error) {
+                                result = model.validationResult = error;
+                            }
+                            return result;
+                        });
+                    }
+                });
+                return result;
+            });
+        });
     },
 
     __presortCollection(columns) {
@@ -446,5 +508,9 @@ export default Marionette.View.extend({
         } else {
             style.innerHTML += newValue;
         }
+    },
+
+    __initializeConfigurationPanel() {
+        this.__configurationPanel = new ConfigurationPanel();
     }
 });

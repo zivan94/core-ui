@@ -101,7 +101,7 @@
   padding: 3px 0 1px 0;
 }
 .bubbles__form {
-  padding-top: 4px;
+  padding: 2px 0;
 }
 .dropdown.open.dropdown__wrp_down .bubbles {
   border-bottom-left-radius: 0;
@@ -259,9 +259,15 @@ svg.svg-grid-icons.svg-icons_flag-none {
   padding: 0 20px 0 15px;
 }
 
+.cell > .context_select {
+  position: static;
+  padding: 4px 20px 4px 10px;
+}
+
 .cell > .editor.editor_document {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .cell > .editor.editor_document > .documents {

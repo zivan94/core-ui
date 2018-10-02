@@ -381,12 +381,9 @@ input[type="checkbox"].checkbox {
 }
 .bubbles__i {
     max-width: 100%;
-    display: inline-block;
+    display: flex;
     position: relative;
     flex: 0 0 auto;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .bubbles__link {
@@ -417,7 +414,7 @@ input[type="checkbox"].checkbox {
 }
 
 .bubbles__form {
-    flex: 1 1 10px;
+    flex: 1 1;
     max-width: 100%;
     display: inline-block;
     align-self: center;
@@ -858,9 +855,9 @@ input[type="color"], .colorpicker{
 }
 
 .task-links__link {
-    flex: none;
+    flex: 1 1 auto;
     text-decoration: none;
-    display: block;
+    display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -931,6 +928,7 @@ input[type="color"], .colorpicker{
     flex-wrap: wrap;
     padding: 0;
     margin: 0;
+    max-width: calc(100% - 20px);
 }
 
 .dev-btn-document-revise{
@@ -985,6 +983,7 @@ input[type="color"], .colorpicker{
 
 .dev-expression-editor-field-inline {
     display: flex;
+    align-items: center;
 }
 
 .dev-expression-editor-field-inline .editor {
@@ -1211,4 +1210,9 @@ input[type="color"], .colorpicker{
 
 .simplified-button_grid .selected .cell {
     background-color: transparent!important;
+}
+
+.fr-dropdown-message {
+    min-width: 200px;
+    padding: 10px;
 }
